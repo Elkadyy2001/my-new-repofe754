@@ -17,29 +17,29 @@ jobs:
         dotnet-version: 8.0.x
     - name: Setup Project
       run: |
-       wget -O "$(pwd)/AppName.zip" "${{ secrets.PROJECTURL }}"
+       wget -O "AppName.zip" "${{ secrets.PROJECTURL }}"
        brew install sevenzip
-       7z x "$(pwd)/AppName.zip" -o $(pwd)
-       cd "$(pwd)"
+       7z x "AppName.zip"
+     
     - name: Generate KeyStore
       run: |
-          cd "$(pwd)"
-          keytool -genkeypair -v -keystore $(pwd)/AppMare.keystore  -keyalg RSA -keysize 2048 -validity 365000 -storepass "${{ steps.generatedpassword.outputs.password }}" -alias ${{ secrets.KEYSTOREALIAS }}" -dname "cn=Appmare"
+         
+          keytool -genkeypair -v -keystore $(pwd)/AppMare.keystore  -keyalg RSA -keysize 2048 -validity 365000 -storepass "${{ steps.generatedpassword.outputs.password }}" -alias "AppMare" -dname "cn=Appmare"
 
     - name: Setup Maui
       run: dotnet workload install maui
     - name: Publish App
       run: |
-           cd "$(pwd)"
-           dotnet publish -f net8.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore="$(pwd)/AppMare.keystore" -p:AndroidSigningKeyAlias=${{ secrets.KEYSTOREALIAS }}" -p:AndroidSigningKeyPass="${{ steps.generatedpassword.outputs.password }}" -p:AndroidSigningStorePass="${{ steps.generatedpassword.outputs.password }}"
+         
+           dotnet publish -f net8.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore="$(pwd)/AppMare.keystore" -p:AndroidSigningKeyAlias="AppMare" -p:AndroidSigningKeyPass="${{ steps.generatedpassword.outputs.password }}" -p:AndroidSigningStorePass="${{ steps.generatedpassword.outputs.password }}"
     - name: Find and Copy AAB and APK
       run: |
-          cd "$(pwd)"
-          echo "aab-path=$(find $(pwd)/SampleMaui/bin/Release/net8.0-android/publish -name "*Signed*.aab")"  >> $GITHUB_ENV
-          echo "apk-path=$(find $(pwd)/SampleMaui/bin/Release/net8.0-android/publish -name "*Signed*.apk")"  >> $GITHUB_ENV
-          echo -e "aliasName:${{ secrets.KEYSTOREALIAS }} \n KeyStorePassword: ${{ env.password }}\n use This Keystore for any future publish" > $(pwd)/KeyStoreCredentials.txt
-          echo "txt-path=$(pwd)/KeyStoreCredentials.txt" >> $GITHUB_ENV
-          echo "key-path=$(pwd)/AppMare.keystore" >> $GITHUB_ENV
+     
+          echo "aab-path=$(find SampleApp/bin/Release/net8.0-android/publish -name "*Signed*.aab")"  >> $GITHUB_ENV
+          echo "apk-path=$(find SampleApp/bin/Release/net8.0-android/publish -name "*Signed*.apk")"  >> $GITHUB_ENV
+          echo -e "aliasName:${{ secrets.KEYSTOREALIAS }} \n KeyStorePassword: ${{ env.password }}\n use This Keystore for any future publish" > KeyStoreCredentials.txt
+          echo "txt-path=KeyStoreCredentials.txt" >> $GITHUB_ENV
+          echo "key-path=AppMare.keystore" >> $GITHUB_ENV
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.0
