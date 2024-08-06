@@ -30,8 +30,8 @@ jobs:
       run: dotnet workload install maui
     - name: Publish App
       run: |
-         
-           dotnet publish -f net8.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore="$(pwd)/AppMare.keystore" -p:AndroidSigningKeyAlias="AppMare" -p:AndroidSigningKeyPass="${{ steps.generatedpassword.outputs.password }}" -p:AndroidSigningStorePass="${{ steps.generatedpassword.outputs.password }}"
+         dotnet publish -f net8.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore="$(pwd)/AppMare.keystore" -p:AndroidSigningKeyAlias="AppMare" -p:AndroidSigningKeyPass="${{ steps.generatedpassword.outputs.password }}" -p:AndroidSigningStorePass="${{ steps.generatedpassword.outputs.password }}"
+           
     - name: Find and Copy AAB and APK
       run: |
      
